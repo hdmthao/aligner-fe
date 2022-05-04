@@ -60,7 +60,6 @@ function authHeader(url) {
 //   console.log(isApiUrl)
 //   console.log(url)
   if (isLoggedIn) {
-    console.log(user.data.token);
     return { Authorization: `Bearer ${user.data.token}` };
   } else {
     return {};

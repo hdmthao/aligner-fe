@@ -10,6 +10,10 @@ import { useRouter } from "next/router";
 
 const Corpus = () => {
   const [authorized, setAuthorized] = useState(false);
+  const [data, setData] = useState(null);
+  const handleDataChange = (newData) => {
+    setData(newData);
+  };
   const router = useRouter();
 
   useEffect(() => {
@@ -34,9 +38,9 @@ const Corpus = () => {
           }}
         >
           <Container maxWidth={false}>
-            <CorpusToolbar />
+            <CorpusToolbar onChangeDataset={(newData) => handleDataChange(newData)} />
             <Box sx={{ mt: 3 }}>
-              <CorpusView dataset={dataset} />
+              <CorpusView dataset={dataset} corpusData={data} />
             </Box>
           </Container>
         </Box>
