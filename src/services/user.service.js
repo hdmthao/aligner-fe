@@ -104,8 +104,8 @@ function createNewDataset(data) {
 
 // sentence_pairs
 
-function getAllSentencePairs(dataset_slug) {
-  return fetchWrapper.get(`${baseUrl}/datasets/${dataset_slug}/sentence_pairs`);
+function getAllSentencePairs(dataset_slug, page=1, size=10) {
+  return fetchWrapper.get(`${baseUrl}/datasets/${dataset_slug}/sentence_pairs?page=${page}&size=${size}`);
 }
 
 function getOneSentencePair(dataset_slug, sentence_pairs_id) {

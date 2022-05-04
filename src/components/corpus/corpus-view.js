@@ -20,27 +20,17 @@ import { userService } from "../../services";
 
 export const CorpusView = ({ dataset, corpusData, ...rest }) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
-  const [limit, setLimit] = useState(10);
-  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+  const [page, setPage] = useState(1);
   const [corpus, setCorpus] = useState(null);
-  // const [dataCorpus, setDataCorpus] = useState(corpusData);
-
-  // useEffect(() => {
-  //   function fetchData() {
-  //     setDataCorpus(corpusData);
-  //   }
-  //   fetchData();
-  // }, [corpusData]);
 
   useEffect(() => {
     async function getCorpus() {
-      let data = await userService.getAllSentencePairs(corpusData);
-      console.log(data);
-      console.log(dataset);
+      let data = await userService.getAllSentencePairs(corpusData, page, size);
       setCorpus(data);
     }
-    getCorpus();
-  }, [corpusData]);
+    if (corpusData) getCorpus();
+  }, [corpusData, page, size]);
 
   const handleSelectAll = (event) => {
     let newSelectedCustomerIds;
@@ -81,13 +71,13 @@ export const CorpusView = ({ dataset, corpusData, ...rest }) => {
     setSelectedCustomerIds(newSelectedCustomerIds);
   };
 
-  const handleLimitChange = (event) => {
-    setPage(0);
-    setLimit(event.target.value);
+  const handleSizeChange = (event) => {
+    setPage(1);
+    setSize(event.target.value);
   };
 
   const handlePageChange = (event, newPage) => {
-    setPage(newPage);
+    setPage(newPage+1);
   };
 
   return (
@@ -108,12 +98,13 @@ export const CorpusView = ({ dataset, corpusData, ...rest }) => {
                     onChange={handleSelectAll}
                   />
                 </TableCell>
+                <TableCell>Status</TableCell>
                 <TableCell>Source corpus</TableCell>
                 <TableCell>Target corpus</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {corpus && corpus.items.slice(page * limit, (page + 1) * limit).map((sentence_pair) => (
+              {corpus && corpus.items.map((sentence_pair) => (
                 <TableRow
                   hover
                   key={sentence_pair.id}
@@ -131,6 +122,18 @@ export const CorpusView = ({ dataset, corpusData, ...rest }) => {
                       }
                       value="true"
                     />
+                  </TableCell>
+                  <TableCell>
+                    <Box
+                      sx={{
+                        alignItems: "center",
+                        display: "flex",
+                      }}
+                    >
+                      <Typography color="textPrimary" variant="body1">
+                        {sentence_pair.status}
+                      </Typography>
+                    </Box>
                   </TableCell>
                   <TableCell>
                     <Box
@@ -164,11 +167,11 @@ export const CorpusView = ({ dataset, corpusData, ...rest }) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={corpus && corpus.items.length}
+        count={(corpus && corpus.total) || 0}
         onPageChange={handlePageChange}
-        onRowsPerPageChange={handleLimitChange}
-        page={page}
-        rowsPerPage={limit}
+        onRowsPerPageChange={handleSizeChange}
+        page={page-1}
+        rowsPerPage={size}
         rowsPerPageOptions={[5, 10, 25]}
       />
     </Card>

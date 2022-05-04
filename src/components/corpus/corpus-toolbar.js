@@ -70,7 +70,7 @@ export const CorpusToolbar = ({ onChangeDataset }, ...props) => {
               inputProps={{ "aria-label": "Without label" }}
             >
               {datasets && datasets.items.slice().map((dataset) => (
-                <MenuItem value={dataset.slug}>{dataset.slug}</MenuItem>
+                <MenuItem key={dataset.slug} value={dataset.slug}>{dataset.slug}</MenuItem>
               ))}
               {/* <MenuItem value="">
                 <em>None</em>
