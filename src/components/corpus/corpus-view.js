@@ -18,7 +18,7 @@ import {
 import { getInitials } from "../../utils/get-initials";
 import { userService } from "../../services";
 
-export const CorpusView = ({ dataset, corpusData, ...rest }) => {
+export const CorpusView = ({ dataset, corpusData,dataSubmitted,setDataSubmitted, ...rest }) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [size, setSize] = useState(10);
   const [page, setPage] = useState(1);
@@ -30,7 +30,8 @@ export const CorpusView = ({ dataset, corpusData, ...rest }) => {
       setCorpus(data);
     }
     if (corpusData) getCorpus();
-  }, [corpusData, page, size]);
+    if (dataSubmitted) setDataSubmitted(false);
+  }, [corpusData, page, size,dataSubmitted]);
 
   const handleSelectAll = (event) => {
     let newSelectedCustomerIds;
@@ -77,7 +78,7 @@ export const CorpusView = ({ dataset, corpusData, ...rest }) => {
   };
 
   const handlePageChange = (event, newPage) => {
-    setPage(newPage+1);
+    setPage(newPage + 1);
   };
 
   return (
@@ -104,63 +105,64 @@ export const CorpusView = ({ dataset, corpusData, ...rest }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {corpus && corpus.items.map((sentence_pair) => (
-                <TableRow
-                  hover
-                  key={sentence_pair.id}
-                  selected={
-                    selectedCustomerIds.indexOf(sentence_pair.id) !== -1
-                  }
-                >
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={
-                        selectedCustomerIds.indexOf(sentence_pair.id) !== -1
-                      }
-                      onChange={(event) =>
-                        handleSelectOne(event, sentence_pair.id)
-                      }
-                      value="true"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        alignItems: "center",
-                        display: "flex",
-                      }}
-                    >
-                      <Typography color="textPrimary" variant="body1">
-                        {sentence_pair.status}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        alignItems: "center",
-                        display: "flex",
-                      }}
-                    >
-                      <Typography color="textPrimary" variant="body1">
-                        {sentence_pair.src_sent}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        alignItems: "center",
-                        display: "flex",
-                      }}
-                    >
-                      <Typography color="textPrimary" variant="body1">
-                        {sentence_pair.tgt_sent}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {corpus &&
+                corpus.items.map((sentence_pair) => (
+                  <TableRow
+                    hover
+                    key={sentence_pair.id}
+                    selected={
+                      selectedCustomerIds.indexOf(sentence_pair.id) !== -1
+                    }
+                  >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={
+                          selectedCustomerIds.indexOf(sentence_pair.id) !== -1
+                        }
+                        onChange={(event) =>
+                          handleSelectOne(event, sentence_pair.id)
+                        }
+                        value="true"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          alignItems: "center",
+                          display: "flex",
+                        }}
+                      >
+                        <Typography color="textPrimary" variant="body1">
+                          {sentence_pair.status}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          alignItems: "center",
+                          display: "flex",
+                        }}
+                      >
+                        <Typography color="textPrimary" variant="body1">
+                          {sentence_pair.src_sent}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          alignItems: "center",
+                          display: "flex",
+                        }}
+                      >
+                        <Typography color="textPrimary" variant="body1">
+                          {sentence_pair.tgt_sent}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </Box>
@@ -170,7 +172,7 @@ export const CorpusView = ({ dataset, corpusData, ...rest }) => {
         count={(corpus && corpus.total) || 0}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleSizeChange}
-        page={page-1}
+        page={page - 1}
         rowsPerPage={size}
         rowsPerPageOptions={[5, 10, 25]}
       />
@@ -178,6 +180,6 @@ export const CorpusView = ({ dataset, corpusData, ...rest }) => {
   );
 };
 
-CorpusView.propTypes = {
-  dataset: PropTypes.array.isRequired,
-};
+// CorpusView.propTypes = {
+//   dataset: PropTypes.array.isRequired,
+// };

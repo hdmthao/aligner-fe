@@ -11,6 +11,8 @@ import { useRouter } from "next/router";
 const Corpus = () => {
   const [authorized, setAuthorized] = useState(false);
   const [data, setData] = useState(null);
+  const [dataSubmitted, setDataSubmitted] = useState(false);
+  const [datasetSubmitted, setDatasetSubmitted] = useState(false);
   const handleDataChange = (newData) => {
     setData(newData);
   };
@@ -38,9 +40,19 @@ const Corpus = () => {
           }}
         >
           <Container maxWidth={false}>
-            <CorpusToolbar onChangeDataset={(newData) => handleDataChange(newData)} />
+            <CorpusToolbar
+              datasetSubmitted={datasetSubmitted}
+              setDatasetSubmitted={setDatasetSubmitted}
+              setDataSubmitted={setDataSubmitted}
+              onChangeDataset={(newData) => handleDataChange(newData)}
+            />
             <Box sx={{ mt: 3 }}>
-              <CorpusView dataset={dataset} corpusData={data} />
+              <CorpusView
+                dataset={dataset}
+                corpusData={data}
+                dataSubmitted={dataSubmitted}
+                setDataSubmitted={setDataSubmitted}
+              />
             </Box>
           </Container>
         </Box>
