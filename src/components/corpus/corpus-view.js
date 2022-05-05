@@ -14,15 +14,27 @@ import {
   TablePagination,
   TableRow,
   Typography,
+  Button,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import { getInitials } from "../../utils/get-initials";
 import { userService } from "../../services";
+import { CorpusPopupForm } from "./alignment/alignment-popup";
+import { CorpusAlignmentModal } from "./alignment/corpus-alignment-modal";
 
-export const CorpusView = ({ dataset, corpusData,dataSubmitted,setDataSubmitted, ...rest }) => {
+export const CorpusView = ({
+  dataset,
+  corpusData,
+  dataSubmitted,
+  setDataSubmitted,
+  ...rest
+}) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [size, setSize] = useState(10);
   const [page, setPage] = useState(1);
   const [corpus, setCorpus] = useState(null);
+  const [openAlignmentPopup, setOpenAlignmentPopup] = useState(false);
+  const [currentSentencePair, setCurrentSentencePair] = useState();
 
   useEffect(() => {
     async function getCorpus() {
@@ -31,21 +43,21 @@ export const CorpusView = ({ dataset, corpusData,dataSubmitted,setDataSubmitted,
     }
     if (corpusData) getCorpus();
     if (dataSubmitted) setDataSubmitted(false);
-  }, [corpusData, page, size,dataSubmitted]);
+  }, [corpusData, page, size, dataSubmitted]);
 
-  const handleSelectAll = (event) => {
-    let newSelectedCustomerIds;
+  // const handleSelectAll = (event) => {
+  //   let newSelectedCustomerIds;
 
-    if (event.target.checked) {
-      newSelectedCustomerIds = dataset.map((customer) => customer.id);
-    } else {
-      newSelectedCustomerIds = [];
-    }
+  //   if (event.target.checked) {
+  //     newSelectedCustomerIds = dataset.map((customer) => customer.id);
+  //   } else {
+  //     newSelectedCustomerIds = [];
+  //   }
 
-    setSelectedCustomerIds(newSelectedCustomerIds);
-  };
+  //   setSelectedCustomerIds(newSelectedCustomerIds);
+  // };
 
-  const handleSelectOne = (event, id) => {
+  const handleSelectOne = (id) => {
     const selectedIndex = selectedCustomerIds.indexOf(id);
     let newSelectedCustomerIds = [];
 
@@ -81,6 +93,17 @@ export const CorpusView = ({ dataset, corpusData,dataSubmitted,setDataSubmitted,
     setPage(newPage + 1);
   };
 
+  const handleAlignment = (sentence_pair) => {
+    handleSelectOne(sentence_pair.id);
+    setOpenAlignmentPopup(true);
+    setCurrentSentencePair(sentence_pair)
+  };
+
+  const handleCloseAlignment = () => {
+    setOpenAlignmentPopup(false);
+    handleSelectOne(currentSentencePair.id);
+  }
+
   return (
     <Card {...rest}>
       <PerfectScrollbar>
@@ -89,19 +112,12 @@ export const CorpusView = ({ dataset, corpusData,dataSubmitted,setDataSubmitted,
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedCustomerIds.length === dataset.length}
-                    color="primary"
-                    indeterminate={
-                      selectedCustomerIds.length > 0 &&
-                      selectedCustomerIds.length < dataset.length
-                    }
-                    onChange={handleSelectAll}
-                  />
+                  <Checkbox disableRipple={true} checked={false} />
                 </TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Source corpus</TableCell>
                 <TableCell>Target corpus</TableCell>
+                <TableCell padding="checkbox">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -119,9 +135,7 @@ export const CorpusView = ({ dataset, corpusData,dataSubmitted,setDataSubmitted,
                         checked={
                           selectedCustomerIds.indexOf(sentence_pair.id) !== -1
                         }
-                        onChange={(event) =>
-                          handleSelectOne(event, sentence_pair.id)
-                        }
+                        onChange={() => handleSelectOne(sentence_pair.id)}
                         value="true"
                       />
                     </TableCell>
@@ -161,11 +175,29 @@ export const CorpusView = ({ dataset, corpusData,dataSubmitted,setDataSubmitted,
                         </Typography>
                       </Box>
                     </TableCell>
+                    <TableCell padding="checkbox">
+                      <Button
+                        color="primary"
+                        size="small"
+                        onClick={() => {
+                          handleAlignment(sentence_pair);
+                        }}
+                      >
+                        <EditIcon size="small" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
             </TableBody>
           </Table>
         </Box>
+        <CorpusPopupForm
+          title="Alignment"
+          openAlignmentPopup={openAlignmentPopup}
+          handleCloseAlignment={handleCloseAlignment}
+        >
+          <CorpusAlignmentModal sentence_pair={currentSentencePair}/>
+        </CorpusPopupForm>
       </PerfectScrollbar>
       <TablePagination
         component="div"
