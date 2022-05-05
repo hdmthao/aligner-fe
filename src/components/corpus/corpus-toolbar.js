@@ -3,27 +3,18 @@ import {
   Button,
   Card,
   CardContent,
-  TextField,
-  InputAdornment,
-  SvgIcon,
-  Typography,
   FormControl,
-  FormHelperText,
   Select,
   MenuItem,
-  InputLabel,
-  Menu,
-  Grid,
 } from "@mui/material";
-import { Search as SearchIcon } from "../../icons/search";
 import { Upload as UploadIcon } from "../../icons/upload";
-import { Download as DownloadIcon } from "../../icons/download";
 import { userService } from "../../services";
 import { useState, useEffect } from "react";
 import { CorpusImportForm } from "./form-import/corpus-import-form";
 import { CorpusPopupForm } from "./form-import/corpus-form-popup";
 import { DatasetCreateForm } from "./form-create-dataset/dataset-create-form";
 import { DatasetPopupForm } from "./form-create-dataset/dataset-form-popup";
+import { CorpusFileUploadPage } from "./form-import/corpus-file-upload-page";
 
 export const CorpusToolbar = (
   {
@@ -38,6 +29,7 @@ export const CorpusToolbar = (
   const [currentDataset, setCurrentDataset] = useState("");
   const [openPopup, setOpenPopup] = useState(false);
   const [openDatasetPopup, setOpenDatasetPopup] = useState(false);
+  const [openFileUploadPopup, setOpenFileUploadPopup] = useState(false);
 
   const handleDatasetChange = (event) => {
     setCurrentDataset(event.target.value);
@@ -141,6 +133,9 @@ export const CorpusToolbar = (
               size="large"
               startIcon={<UploadIcon fontSize="small" />}
               sx={{ mr: 1 }}
+              onClick={() => {
+                setOpenFileUploadPopup(true);
+              }}
             >
               Import from file
             </Button>
@@ -182,6 +177,16 @@ export const CorpusToolbar = (
           setDataSubmitted={setDataSubmitted}
           dataset={currentDataset}
           setOpenPopup={setOpenPopup}
+        />
+      </CorpusPopupForm>
+      <CorpusPopupForm
+        title="Import sentence pairs from file"
+        openPopup={openFileUploadPopup}
+        setOpenPopup={setOpenFileUploadPopup}
+      >
+        <CorpusFileUploadPage
+          datasetSlug={currentDataset}
+          setOpenFileUploadPopup={setOpenFileUploadPopup}
         />
       </CorpusPopupForm>
 

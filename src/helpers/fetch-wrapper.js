@@ -19,15 +19,14 @@ function get(url) {
   return fetch(url, requestOptions).then(handleResponse);
 }
 
-function post(url, body) {
+function post(url, body, config) {
   const requestOptions = {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
       ...authHeader(url),
     },
     // credentials: 'include',
-    body: JSON.stringify(body),
+    body: body instanceof FormData ? body : JSON.stringify(body),
   };
   return fetch(url, requestOptions).then(handleResponse);
 }
@@ -76,7 +75,7 @@ function handleResponse(response) {
         userService.logout();
       }
 
-      const error = (data && data.message) || response.statusText;
+      const error = (data && (data.detail || data.message)) || response.statusText;
       return Promise.reject(error);
     }
 

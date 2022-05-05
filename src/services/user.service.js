@@ -27,7 +27,7 @@ export const userService = {
   getAllSentencePairs,
   getOneSentencePair,
   createNewSentencePair,
-  importSentencePairData,
+  importSentencePairsFromFile,
   acquireSentencePair,
   autoAlignOneSentencePair,
   autoAlignAllSentencePairs,
@@ -118,8 +118,8 @@ function createNewSentencePair(data, dataset_slug) {
   return fetchWrapper.post(`${baseUrl}/datasets/${dataset_slug}/sentence_pairs`, data);
 }
 
-function importSentencePairData(data, dataset_slug) {
-  return fetchWrapper.post(`${baseUrl}/datasets/${dataset_slug}/import`, data);
+function importSentencePairsFromFile(dataset_slug, form_data) {
+  return fetchWrapper.post(`${baseUrl}/datasets/${dataset_slug}/import`, form_data, { contentType: "multipart/form-data" });
 }
 
 // alignment_actions
