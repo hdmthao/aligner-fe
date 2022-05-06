@@ -15,6 +15,7 @@ import { CorpusPopupForm } from "./form-import/corpus-form-popup";
 import { DatasetCreateForm } from "./form-create-dataset/dataset-create-form";
 import { DatasetPopupForm } from "./form-create-dataset/dataset-form-popup";
 import { CorpusFileUploadPage } from "./form-import/corpus-file-upload-page";
+import { CorpusAutoAlign } from "./form-import/corpus-auto-align";
 
 export const CorpusToolbar = (
   {
@@ -29,6 +30,7 @@ export const CorpusToolbar = (
   const [currentDataset, setCurrentDataset] = useState("");
   const [openPopup, setOpenPopup] = useState(false);
   const [openDatasetPopup, setOpenDatasetPopup] = useState(false);
+  const [openAutoAlignPopup, setOpenAutoAlignPopup] = useState(false);
   const [openFileUploadPopup, setOpenFileUploadPopup] = useState(false);
 
   const handleDatasetChange = (event) => {
@@ -117,6 +119,15 @@ export const CorpusToolbar = (
             >
               Create new dataset
             </Button>
+            <Button
+              color="primary"
+              size="large"
+              onClick={() => {
+                setOpenAutoAlignPopup(true);
+              }}
+            >
+              Auto align dataset
+            </Button>
           </Box>
 
           <Box sx={{ m: 1 }}>
@@ -200,6 +211,17 @@ export const CorpusToolbar = (
           setOpenDatasetPopup={setOpenDatasetPopup}
         />
       </DatasetPopupForm>
+
+      <CorpusPopupForm
+        title="Auto align"
+        openPopup={openAutoAlignPopup}
+        setOpenPopup={setOpenAutoAlignPopup}
+      >
+        <CorpusAutoAlign
+          datasetSlug={currentDataset}
+          setOpenAutoAlignPopup={setOpenAutoAlignPopup}
+        />
+      </CorpusPopupForm>
     </>
   );
 };
