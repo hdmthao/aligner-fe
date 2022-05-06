@@ -3,7 +3,6 @@ import { Box, Container } from "@mui/material";
 import { CorpusView } from "../components/corpus/corpus-view";
 import { CorpusToolbar } from "../components/corpus/corpus-toolbar";
 import { DashboardLayout } from "../components/dashboard-layout";
-import { customers as dataset } from "../__mocks__/customers";
 import { userService } from "../services";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -48,7 +47,6 @@ const Corpus = () => {
             />
             <Box sx={{ mt: 3 }}>
               <CorpusView
-                dataset={dataset}
                 corpusData={data}
                 dataSubmitted={dataSubmitted}
                 setDataSubmitted={setDataSubmitted}
