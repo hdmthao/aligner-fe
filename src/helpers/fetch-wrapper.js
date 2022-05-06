@@ -28,6 +28,9 @@ function post(url, body, config) {
     // credentials: 'include',
     body: body instanceof FormData ? body : JSON.stringify(body),
   };
+  if (!config?.contentType || config.contentType !== "multipart/form-data") {
+    requestOptions.headers["Content-Type"] = "application/json";
+  }
   return fetch(url, requestOptions).then(handleResponse);
 }
 
