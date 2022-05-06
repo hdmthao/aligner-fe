@@ -19,6 +19,27 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 
 export const CorpusAlignmentModal = (props) => {
   const { sentence_pair } = props;
+  const [srcAlignments, setSrcAlignments] = useState({});
+  const [tgtAlignments, setTgtAlignments] = useState({});
+
+  useEffect(() => {
+    sentence_pair.alignments.map((align) => {
+      let src_tmp = srcAlignments;
+      let tgt_tmp = tgtAlignments;
+      let src_key = `src_${align.src_idx}`;
+      let tgt_key = `tgt_${align.tgt_idx}`;
+      if (!(src_key in src_tmp)) {
+        src_tmp[src_key] = tgt_key;
+      }
+      if (!(tgt_key in tgt_tmp)) {
+        tgt_tmp[tgt_key] = src_key;
+      }
+      setSrcAlignments(src_tmp);
+      setTgtAlignments(tgt_tmp);
+    });
+    console.log(srcAlignments);
+    console.log(tgtAlignments);
+  }, [sentence_pair, srcAlignments, tgtAlignments]);
 
   // const handleSubmit = (e) => {
   //   userService.createNewSentencePair(data, dataset).then((res)=>{
@@ -29,99 +50,171 @@ export const CorpusAlignmentModal = (props) => {
   // };
 
   return (
-    <Card>
+    <Box>
       <PerfectScrollbar>
-        <Box sx={{}}>
+        <Box>
           <Table>
             <TableBody>
-              <TableRow sx={{}}>
-                <TableCell
-                  sx={{
-                    paddingRight: 2,
-                    paddingBottom: 10,
-                    paddingTop: 5,
-                    borderRight: "1px solid black",
-                    fontSize: "1rem",
-                    width: 100,
-                  }}
-                >
-                  Source
-                </TableCell>
-                {sentence_pair &&
-                  sentence_pair.src_tokenize.map((src) => (
-                    <TableCell
-                      sx={{
-                        paddingLeft: 2,
-                        paddingBottom: 10,
-                        paddingTop: 5,
-                      }}
-                    >
-                      {src}
-                    </TableCell>
-                  ))}
-              </TableRow>
-              <TableRow sx={{ m: 20 }}>
-                <TableCell
-                  sx={{
-                    paddingRight: 2,
-                    paddingBottom: 5,
-                    paddingTop: 10,
-                    borderRight: "1px solid black",
-                    fontSize: "1rem",
-                    width: 100,
-                  }}
-                >
-                  Target
-                </TableCell>
+              <ArcherContainer>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      paddingRight: 2,
+                      paddingBottom: 10,
+                      paddingTop: 5,
+                      borderRight: "1px solid black",
+                      fontSize: "1rem",
+                      width: 100,
+                    }}
+                  >
+                    Source
+                  </TableCell>
+                  {sentence_pair &&
+                    sentence_pair.src_tokenize.map((src, idx) => (
+                      <TableCell
+                        sx={{
+                          px: 0,
+                          paddingBottom: 10,
+                          paddingTop: 5,
+                        }}
+                      >
+                        <ArcherElement
+                          id={`src_${idx}`}
+                          relations={[
+                            {
+                              targetId:
+                                srcAlignments[`src_${idx}`] || `src_${idx}`,
+                              targetAnchor: srcAlignments[`src_${idx}`]
+                                ? "top"
+                                : "bottom",
+                              sourceAnchor: "bottom",
+                              style: {
+                                strokeColor: "#275efe",
+                                strokeWidth: 1,
+                                endMarker: false,
+                              },
+                            },
+                          ]}
+                        >
+                          <Button
+                            size="small"
+                            sx={{
+                              color: "black",
+                              fontWeight: 400,
+                              margin: 0,
+                            }}
+                            onClick={() => {
+                              console.log(idx);
+                            }}
+                          >
+                            {src}
+                          </Button>
+                        </ArcherElement>
+                      </TableCell>
+                    ))}
+                </TableRow>
+                <TableRow sx={{ m: 20 }}>
+                  <TableCell
+                    sx={{
+                      paddingRight: 2,
+                      paddingBottom: 5,
+                      paddingTop: 10,
+                      borderRight: "1px solid black",
+                      fontSize: "1rem",
+                      width: 100,
+                    }}
+                  >
+                    Target
+                  </TableCell>
 
-                {sentence_pair &&
-                  sentence_pair.tgt_tokenize.map((tgt) => (
-                    <TableCell
-                      sx={{
-                        paddingLeft: 2,
-                        paddingBottom: 5,
-                        paddingTop: 10,
-                      }}
-                    >
-                      {tgt}
-                    </TableCell>
-                  ))}
-              </TableRow>
+                  {sentence_pair &&
+                    sentence_pair.tgt_tokenize.map((tgt, idx) => {
+                      let doAlgin = false;
+                      if (
+                        tgtAlignments[`tgt_${idx}`] && srcAlignments[tgtAlignments[`tgt_${idx}`]] !=
+                        `tgt_${idx}`
+                      )
+                        doAlgin = true;
+                      return (
+                        <TableCell
+                          sx={{
+                            px: 0,
+                            paddingBottom: 5,
+                            paddingTop: 10,
+                          }}
+                        >
+                          <ArcherElement
+                            id={`tgt_${idx}`}
+                            relations={[
+                              {
+                                targetId: doAlgin
+                                  ? tgtAlignments[`tgt_${idx}`]
+                                  : `tgt_${idx}`,
+                                targetAnchor: doAlgin ? "bottom" : "top",
+                                sourceAnchor: "top",
+                                style: {
+                                  strokeColor: "#275efe",
+                                  strokeWidth: 1,
+                                  endMarker: false,
+                                },
+                              },
+                            ]}
+                          >
+                            <Button
+                              size="small"
+                              sx={{
+                                color: "black",
+                                fontWeight: 400,
+                                margin: 0,
+                              }}
+                              onClick={() => {
+                                console.log(idx);
+                              }}
+                            >
+                              {tgt}
+                            </Button>
+                          </ArcherElement>
+                        </TableCell>
+                      );
+                    })}
+                </TableRow>
+              </ArcherContainer>
             </TableBody>
           </Table>
         </Box>
+        {/* </PerfectScrollbar> */}
+        <Box sx={{ my: 2 }}>
+          <Grid
+            container
+            spacing={1}
+            sx={{ mt: 0.5 }}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Grid item>
+              <Button color="primary" variant="contained">
+                Auto align
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={() => {
+                  console.log(sentence_pair);
+                }}
+              >
+                Update
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button color="error" variant="contained">
+                Cancel
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
       </PerfectScrollbar>
-      <Box sx={{ my: 2 }}>
-        <Grid
-          container
-          spacing={1}
-          sx={{ mt: 0.5 }}
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Grid item>
-            <Button color="primary" variant="contained">
-              Auto align
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              color="primary"
-              variant="contained"
-              onClick={() => {
-                console.log(sentence_pair);
-              }}
-            >
-              Update
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button color="error" variant="contained">
-              Cancel
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
-    </Card>
+    </Box>
   );
 };
