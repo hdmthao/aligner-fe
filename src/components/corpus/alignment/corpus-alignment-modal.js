@@ -16,6 +16,8 @@ import {
 import { userService } from "../../../services/user.service";
 import { ArcherContainer, ArcherElement } from "react-archer";
 import PerfectScrollbar from "react-perfect-scrollbar";
+import { Notification } from "../../alerts/Notifications";
+import { ConfirmDialog } from "../../alerts/ConfirmDialog";
 
 export const CorpusAlignmentModal = (props) => {
   const { sentence_pair, updateSentencePair } = props;
@@ -27,7 +29,16 @@ export const CorpusAlignmentModal = (props) => {
     tgt: "",
     cur: "",
   });
-  // const [curSentence_pair, setCurSentence_pair] = useState(sentence_pair);
+  const [notify, setNotify] = useState({
+    isOpen: false,
+    message: "",
+    type: "",
+  });
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    title: "",
+    subTitle: "",
+  });
 
   const handleOnClickWord = (word, idx) => {
     console.log(word, idx);
@@ -122,6 +133,10 @@ export const CorpusAlignmentModal = (props) => {
   }, [sentence_pair, alignStatus]);
 
   const handleUpdateAligns = () => {
+    setConfirmDialog({
+      ...confirmDialog,
+      isOpen: true,
+    });
     const dataset_slug =
       sentence_pair.dataset_slug || sentence_pair.dataset.slug;
     const sentence_pair_id = sentence_pair.id;
@@ -146,6 +161,12 @@ export const CorpusAlignmentModal = (props) => {
       .then((res) => {
         updateSentencePair(sentence_pair);
       });
+
+      let newNotify = JSON.parse(JSON.stringify(notify));
+      newNotify.isOpen=true;
+      newNotify.message="Update Successfully";
+      newNotify.type= "success";
+    setNotify(newNotify);
   };
 
   const handleAutoAlign = () => {
@@ -348,6 +369,11 @@ export const CorpusAlignmentModal = (props) => {
             </Grid>
           </Grid>
         </Box>
+        {/* <Notification notify={notify} setNotify={setNotify} /> */}
+        {/* <ConfirmDialog
+          confirmDialog={confirmDialog}
+          setConfirmDialog={setConfirmDialog}
+        /> */}
       </PerfectScrollbar>
     </Box>
   );
