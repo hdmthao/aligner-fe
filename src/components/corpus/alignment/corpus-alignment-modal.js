@@ -21,25 +21,29 @@ export const CorpusAlignmentModal = (props) => {
   const { sentence_pair } = props;
   const [srcAlignments, setSrcAlignments] = useState({});
   const [tgtAlignments, setTgtAlignments] = useState({});
+  const [alignStatus, setAlignStatus] = useState("");
+  const [currentAlign, setCurrentAlign] = useState({});
+  const handleOnClick = (word, idx) => {
+    
+  };
 
   useEffect(() => {
+    let srcAligns = JSON.parse(JSON.stringify(srcAlignments));
+    let tgtAligns = JSON.parse(JSON.stringify(tgtAlignments));
     sentence_pair.alignments.map((align) => {
-      let src_tmp = srcAlignments;
-      let tgt_tmp = tgtAlignments;
       let src_key = `src_${align.src_idx}`;
       let tgt_key = `tgt_${align.tgt_idx}`;
-      if (!(src_key in src_tmp)) {
-        src_tmp[src_key] = tgt_key;
+      if (!(src_key in srcAligns)) {
+        srcAligns[src_key] = tgt_key;
       }
-      if (!(tgt_key in tgt_tmp)) {
-        tgt_tmp[tgt_key] = src_key;
+      if (!(tgt_key in tgtAligns)) {
+        tgtAligns[tgt_key] = src_key;
       }
-      setSrcAlignments(src_tmp);
-      setTgtAlignments(tgt_tmp);
     });
-    console.log(srcAlignments);
-    console.log(tgtAlignments);
-  }, [sentence_pair, srcAlignments, tgtAlignments]);
+
+    setSrcAlignments(srcAligns);
+    setTgtAlignments(tgtAligns);
+  }, [sentence_pair]);
 
   // const handleSubmit = (e) => {
   //   userService.createNewSentencePair(data, dataset).then((res)=>{
@@ -53,9 +57,9 @@ export const CorpusAlignmentModal = (props) => {
     <Box>
       <PerfectScrollbar>
         <Box>
-          <Table>
-            <TableBody>
-              <ArcherContainer>
+          <ArcherContainer>
+            <Table>
+              <TableBody>
                 <TableRow>
                   <TableCell
                     sx={{
@@ -72,6 +76,7 @@ export const CorpusAlignmentModal = (props) => {
                   {sentence_pair &&
                     sentence_pair.src_tokenize.map((src, idx) => (
                       <TableCell
+                        key={`src_${idx}`}
                         sx={{
                           px: 0,
                           paddingBottom: 10,
@@ -130,13 +135,17 @@ export const CorpusAlignmentModal = (props) => {
                   {sentence_pair &&
                     sentence_pair.tgt_tokenize.map((tgt, idx) => {
                       let doAlgin = false;
+
                       if (
-                        tgtAlignments[`tgt_${idx}`] && srcAlignments[tgtAlignments[`tgt_${idx}`]] !=
-                        `tgt_${idx}`
+                        tgtAlignments[`tgt_${idx}`] &&
+                        srcAlignments[tgtAlignments[`tgt_${idx}`]] !=
+                          `tgt_${idx}`
                       )
                         doAlgin = true;
+
                       return (
                         <TableCell
+                          key={`tgt_${idx}`}
                           sx={{
                             px: 0,
                             paddingBottom: 5,
@@ -178,9 +187,9 @@ export const CorpusAlignmentModal = (props) => {
                       );
                     })}
                 </TableRow>
-              </ArcherContainer>
-            </TableBody>
-          </Table>
+              </TableBody>
+            </Table>
+          </ArcherContainer>
         </Box>
         {/* </PerfectScrollbar> */}
         <Box sx={{ my: 2 }}>
@@ -192,7 +201,13 @@ export const CorpusAlignmentModal = (props) => {
             justifyContent="center"
           >
             <Grid item>
-              <Button color="primary" variant="contained">
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={() => {
+                  console.log();
+                }}
+              >
                 Auto align
               </Button>
             </Grid>
