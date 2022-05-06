@@ -124,19 +124,19 @@ function importSentencePairsFromFile(dataset_slug, form_data) {
 
 // alignment_actions
 function acquireSentencePair(dataset_slug, sentence_pairs_id) {
-  return fetchWrapper.get(
+  return fetchWrapper.post(
     `${baseUrl}/datasets/${dataset_slug}/sentence_pairs/${sentence_pairs_id}/acquire`
   );
 }
 
 function autoAlignOneSentencePair(dataset_slug, sentence_pairs_id) {
-  return fetchWrapper.get(
+  return fetchWrapper.post(
     `${baseUrl}/datasets/${dataset_slug}/sentence_pairs/${sentence_pairs_id}/auto_align`
   );
 }
 
 function autoAlignAllSentencePairs(dataset_slug) {
-  return fetchWrapper.get(`${baseUrl}/datasets/${dataset_slug}/auto_align`);
+  return fetchWrapper.post(`${baseUrl}/datasets/${dataset_slug}/auto_align`);
 }
 
 function updateAlignOneSentencePair(dataset_slug, sentence_pairs_id,alignments) {

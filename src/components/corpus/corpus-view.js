@@ -45,17 +45,13 @@ export const CorpusView = ({
     if (dataSubmitted) setDataSubmitted(false);
   }, [corpusData, page, size, dataSubmitted]);
 
-  // const handleSelectAll = (event) => {
-  //   let newSelectedCustomerIds;
-
-  //   if (event.target.checked) {
-  //     newSelectedCustomerIds = dataset.map((customer) => customer.id);
-  //   } else {
-  //     newSelectedCustomerIds = [];
-  //   }
-
-  //   setSelectedCustomerIds(newSelectedCustomerIds);
-  // };
+  async function updateCurrentSentencePair(sentence_pair) {
+    const newSentencePair = await userService.getOneSentencePair(
+      sentence_pair.dataset_slug || sentence_pair.dataset.slug,
+      sentence_pair.id
+    );
+    setCurrentSentencePair(newSentencePair.data);
+  }
 
   const handleSelectOne = (id) => {
     const selectedIndex = selectedCustomerIds.indexOf(id);
@@ -96,13 +92,14 @@ export const CorpusView = ({
   const handleAlignment = (sentence_pair) => {
     handleSelectOne(sentence_pair.id);
     setOpenAlignmentPopup(true);
-    setCurrentSentencePair(sentence_pair)
+    if (!(currentSentencePair && sentence_pair.id == currentSentencePair.id))
+      setCurrentSentencePair(sentence_pair);
   };
 
   const handleCloseAlignment = () => {
     setOpenAlignmentPopup(false);
     handleSelectOne(currentSentencePair.id);
-  }
+  };
 
   return (
     <Card {...rest}>
@@ -196,7 +193,12 @@ export const CorpusView = ({
           openAlignmentPopup={openAlignmentPopup}
           handleCloseAlignment={handleCloseAlignment}
         >
-          <CorpusAlignmentModal sentence_pair={currentSentencePair}/>
+          <CorpusAlignmentModal
+            sentence_pair={currentSentencePair}
+            updateSentencePair={(curSentence) =>
+              updateCurrentSentencePair(curSentence)
+            }
+          />
         </CorpusPopupForm>
       </PerfectScrollbar>
       <TablePagination

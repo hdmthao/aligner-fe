@@ -18,7 +18,7 @@ import { ArcherContainer, ArcherElement } from "react-archer";
 import PerfectScrollbar from "react-perfect-scrollbar";
 
 export const CorpusAlignmentModal = (props) => {
-  const { sentence_pair } = props;
+  const { sentence_pair, updateSentencePair } = props;
   const [srcAlignments, setSrcAlignments] = useState({});
   const [tgtAlignments, setTgtAlignments] = useState({});
   const [alignStatus, setAlignStatus] = useState("initial");
@@ -27,6 +27,7 @@ export const CorpusAlignmentModal = (props) => {
     tgt: "",
     cur: "",
   });
+  // const [curSentence_pair, setCurSentence_pair] = useState(sentence_pair);
 
   const handleOnClickWord = (word, idx) => {
     console.log(word, idx);
@@ -55,9 +56,15 @@ export const CorpusAlignmentModal = (props) => {
   };
 
   useEffect(() => {
-    let srcAligns = JSON.parse(JSON.stringify(srcAlignments));
-    let tgtAligns = JSON.parse(JSON.stringify(tgtAlignments));
-    if (alignStatus == "initial") {
+    let srcAligns =
+      alignStatus == "auto aligned"
+        ? {}
+        : JSON.parse(JSON.stringify(srcAlignments));
+    let tgtAligns =
+      alignStatus == "auto aligned"
+        ? {}
+        : JSON.parse(JSON.stringify(tgtAlignments));
+    if (alignStatus == "initial" || alignStatus == "auto aligned") {
       sentence_pair.alignments.map((align) => {
         let src_key = `src_${align.src_idx}`;
         let tgt_key = `tgt_${align.tgt_idx}`;
@@ -112,18 +119,22 @@ export const CorpusAlignmentModal = (props) => {
     }
     setSrcAlignments(srcAligns);
     setTgtAlignments(tgtAligns);
-    console.log("source", srcAligns);
-    console.log("target", tgtAligns);
   }, [sentence_pair, alignStatus]);
 
   const handleUpdateAligns = () => {
     const dataset_slug = sentence_pair.dataset_slug;
     const sentence_pair_id = sentence_pair.id;
     const alignments = {};
-    // userService
-    //   .updateAlignOneSentencePair(dataset_slug, sentence_pair_id, alignments)
-    //   .then((res) => {});
-    console.log('Update')
+    console.log("Update");
+  };
+
+  const handleAutoAlign = () => {
+    const dataset_slug =
+      sentence_pair.dataset_slug || sentence_pair.dataset.slug;
+    const sentence_pair_id = sentence_pair.id;
+    userService.autoAlignOneSentencePair(dataset_slug, sentence_pair_id);
+    updateSentencePair(sentence_pair);
+    setAlignStatus("auto aligned");
   };
 
   return (
@@ -284,7 +295,7 @@ export const CorpusAlignmentModal = (props) => {
                 color="primary"
                 variant="contained"
                 onClick={() => {
-                  console.log();
+                  handleAutoAlign();
                 }}
               >
                 Auto align
