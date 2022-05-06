@@ -119,11 +119,21 @@ export const CorpusAlignmentModal = (props) => {
   const handleUpdateAligns = () => {
     const dataset_slug = sentence_pair.dataset_slug;
     const sentence_pair_id = sentence_pair.id;
-    const alignments = {};
-    // userService
-    //   .updateAlignOneSentencePair(dataset_slug, sentence_pair_id, alignments)
-    //   .then((res) => {});
-    console.log('Update')
+    const alignments = [];
+    for (const [src, tgt] of Object.entries(srcAlignments)) {
+      const srcIdx = src.match(/\d+/g)[0];
+      const tgtIdx = tgt.match(/\d+/g)[0];
+      alignments.push({ src_idx: srcIdx, tgt_idx: tgtIdx })
+    }
+    for (const [tgt, src] of Object.entries(tgtAlignments)) {
+      const srcIdx = src.match(/\d+/g)[0];
+      const tgtIdx = tgt.match(/\d+/g)[0];
+      const found = alignments.find(e => e.src_idx === srcIdx && e.tgt_idx == tgtIdx);
+      if (!found) alignments.push({ src_idx: srcIdx, tgt_idx: tgtIdx })
+    }
+    userService
+      .updateAlignOneSentencePair(dataset_slug, sentence_pair_id, { alignments })
+      .then((res) => {console.log(res)});
   };
 
   return (
