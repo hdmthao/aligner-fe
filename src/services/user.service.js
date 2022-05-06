@@ -139,8 +139,8 @@ function autoAlignAllSentencePairs(dataset_slug) {
   return fetchWrapper.get(`${baseUrl}/datasets/${dataset_slug}/auto_align`);
 }
 
-function updateAlignOneSentencePair(dataset_slug, sentence_pairs_id) {
+function updateAlignOneSentencePair(dataset_slug, sentence_pairs_id,alignments) {
   return fetchWrapper.put(
-    `${baseUrl}/datasets/${dataset_slug}/sentence_pairs/${sentence_pairs_id}/alignments`
+    `${baseUrl}/datasets/${dataset_slug}/sentence_pairs/${sentence_pairs_id}/alignments`,alignments
   );
 }

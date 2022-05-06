@@ -21,37 +21,110 @@ export const CorpusAlignmentModal = (props) => {
   const { sentence_pair } = props;
   const [srcAlignments, setSrcAlignments] = useState({});
   const [tgtAlignments, setTgtAlignments] = useState({});
-  const [alignStatus, setAlignStatus] = useState("");
-  const [currentAlign, setCurrentAlign] = useState({});
-  const handleOnClick = (word, idx) => {
-    
+  const [alignStatus, setAlignStatus] = useState("initial");
+  const [currentAlign, setCurrentAlign] = useState({
+    src: "",
+    tgt: "",
+    cur: "",
+  });
+
+  const handleOnClickWord = (word, idx) => {
+    console.log(word, idx);
+    let curAlign = JSON.parse(JSON.stringify(currentAlign));
+    if (alignStatus != "aligning") {
+      setAlignStatus("aligning");
+      curAlign[word] = `${word}_${idx}`;
+      curAlign.cur = word;
+    } else if (alignStatus == "aligning") {
+      if (curAlign[word] == `${word}_${idx}`) {
+        setAlignStatus("unaligned");
+        curAlign.cur = "";
+        curAlign[word] = "";
+      } else if (curAlign.cur == word) {
+        curAlign[word] = `${word}_${idx}`;
+      } else {
+        curAlign[word] = `${word}_${idx}`;
+        setAlignStatus("aligned");
+      }
+    }
+    setCurrentAlign(curAlign);
+  };
+
+  const handleDeleteAlign = () => {
+    setAlignStatus("deleting");
   };
 
   useEffect(() => {
     let srcAligns = JSON.parse(JSON.stringify(srcAlignments));
     let tgtAligns = JSON.parse(JSON.stringify(tgtAlignments));
-    sentence_pair.alignments.map((align) => {
-      let src_key = `src_${align.src_idx}`;
-      let tgt_key = `tgt_${align.tgt_idx}`;
-      if (!(src_key in srcAligns)) {
-        srcAligns[src_key] = tgt_key;
+    if (alignStatus == "initial") {
+      sentence_pair.alignments.map((align) => {
+        let src_key = `src_${align.src_idx}`;
+        let tgt_key = `tgt_${align.tgt_idx}`;
+        if (!(src_key in srcAligns)) {
+          srcAligns[src_key] = tgt_key;
+        }
+        if (!(tgt_key in tgtAligns)) {
+          tgtAligns[tgt_key] = src_key;
+        }
+      });
+    } else {
+      if (alignStatus == "aligned") {
+        let src_key = currentAlign.src;
+        let tgt_key = currentAlign.tgt;
+        if (!(src_key in srcAligns)) {
+          srcAligns[src_key] = tgt_key;
+        }
+        if (!(tgt_key in tgtAligns)) {
+          tgtAligns[tgt_key] = src_key;
+        }
+        setCurrentAlign({
+          src: "",
+          tgt: "",
+          cur: "",
+        });
       }
-      if (!(tgt_key in tgtAligns)) {
-        tgtAligns[tgt_key] = src_key;
+      if (alignStatus == "deleting") {
+        let src_key = currentAlign.src;
+        let tgt_key = currentAlign.tgt;
+        if (src_key != "") {
+          delete srcAligns[src_key];
+          for (let key in tgtAligns) {
+            if (tgtAligns[key] == src_key) {
+              delete tgtAligns[key];
+            }
+          }
+        }
+        if (tgt_key != "") {
+          delete tgtAligns[tgt_key];
+          for (let key in srcAligns) {
+            if (srcAligns[key] == tgt_key) {
+              delete srcAligns[key];
+            }
+          }
+        }
+        setCurrentAlign({
+          src: "",
+          tgt: "",
+          cur: "",
+        });
       }
-    });
-
+    }
     setSrcAlignments(srcAligns);
     setTgtAlignments(tgtAligns);
-  }, [sentence_pair]);
+    console.log("source", srcAligns);
+    console.log("target", tgtAligns);
+  }, [sentence_pair, alignStatus]);
 
-  // const handleSubmit = (e) => {
-  //   userService.createNewSentencePair(data, dataset).then((res)=>{
-  //     resetForm();
-  //     setOpenPopup(false);
-  //     setDataSubmitted(true);
-  //   });
-  // };
+  const handleUpdateAligns = () => {
+    const dataset_slug = sentence_pair.dataset_slug;
+    const sentence_pair_id = sentence_pair.id;
+    const alignments = {};
+    // userService
+    //   .updateAlignOneSentencePair(dataset_slug, sentence_pair_id, alignments)
+    //   .then((res) => {});
+    console.log('Update')
+  };
 
   return (
     <Box>
@@ -104,12 +177,15 @@ export const CorpusAlignmentModal = (props) => {
                           <Button
                             size="small"
                             sx={{
-                              color: "black",
+                              color:
+                                currentAlign.src == `src_${idx}`
+                                  ? "red"
+                                  : "black",
                               fontWeight: 400,
                               margin: 0,
                             }}
                             onClick={() => {
-                              console.log(idx);
+                              handleOnClickWord("src", idx);
                             }}
                           >
                             {src}
@@ -172,12 +248,15 @@ export const CorpusAlignmentModal = (props) => {
                             <Button
                               size="small"
                               sx={{
-                                color: "black",
+                                color:
+                                  currentAlign.tgt == `tgt_${idx}`
+                                    ? "red"
+                                    : "black",
                                 fontWeight: 400,
                                 margin: 0,
                               }}
                               onClick={() => {
-                                console.log(idx);
+                                handleOnClickWord("tgt", idx);
                               }}
                             >
                               {tgt}
@@ -213,18 +292,24 @@ export const CorpusAlignmentModal = (props) => {
             </Grid>
             <Grid item>
               <Button
-                color="primary"
+                color="success"
                 variant="contained"
                 onClick={() => {
-                  console.log(sentence_pair);
+                  handleUpdateAligns();
                 }}
               >
                 Update
               </Button>
             </Grid>
             <Grid item>
-              <Button color="error" variant="contained">
-                Cancel
+              <Button
+                color="error"
+                variant="contained"
+                onClick={() => {
+                  handleDeleteAlign();
+                }}
+              >
+                Delete align
               </Button>
             </Grid>
           </Grid>
