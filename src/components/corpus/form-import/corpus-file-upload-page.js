@@ -21,8 +21,8 @@ export const CorpusFileUploadPage = (props) => {
 
     formData.append('data_file', selectedFile);
     userService.importSentencePairsFromFile(datasetSlug, formData).then((res) => {
-      alertService.success(res.data.imported_sentence_pairs_count)
       setOpenFileUploadPopup(false);
+      window.location.reload(false);
     }).catch((err) => {
       alertService.error(err)
     });

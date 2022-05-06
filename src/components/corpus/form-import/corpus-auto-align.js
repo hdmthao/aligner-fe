@@ -11,6 +11,7 @@ export const CorpusAutoAlign = (props) => {
   useEffect(() => {
     userService.autoAlignAllSentencePairs(datasetSlug).then((res) => {
       setOpenAutoAlignPopup(false);
+      window.location.reload(false);
     })
   }, [])
 
