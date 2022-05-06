@@ -122,19 +122,42 @@ export const CorpusAlignmentModal = (props) => {
   }, [sentence_pair, alignStatus]);
 
   const handleUpdateAligns = () => {
-    const dataset_slug = sentence_pair.dataset_slug;
+    const dataset_slug =
+      sentence_pair.dataset_slug || sentence_pair.dataset.slug;
     const sentence_pair_id = sentence_pair.id;
-    const alignments = {};
-    console.log("Update");
+    const alignments = [];
+    for (const [src, tgt] of Object.entries(srcAlignments)) {
+      const srcIdx = src.match(/\d+/g)[0];
+      const tgtIdx = tgt.match(/\d+/g)[0];
+      alignments.push({ src_idx: srcIdx, tgt_idx: tgtIdx });
+    }
+    for (const [tgt, src] of Object.entries(tgtAlignments)) {
+      const srcIdx = src.match(/\d+/g)[0];
+      const tgtIdx = tgt.match(/\d+/g)[0];
+      const found = alignments.find(
+        (e) => e.src_idx === srcIdx && e.tgt_idx == tgtIdx
+      );
+      if (!found) alignments.push({ src_idx: srcIdx, tgt_idx: tgtIdx });
+    }
+    userService
+      .updateAlignOneSentencePair(dataset_slug, sentence_pair_id, {
+        alignments,
+      })
+      .then((res) => {
+        updateSentencePair(sentence_pair);
+      });
   };
 
   const handleAutoAlign = () => {
     const dataset_slug =
       sentence_pair.dataset_slug || sentence_pair.dataset.slug;
     const sentence_pair_id = sentence_pair.id;
-    userService.autoAlignOneSentencePair(dataset_slug, sentence_pair_id);
-    updateSentencePair(sentence_pair);
-    setAlignStatus("auto aligned");
+    userService
+      .autoAlignOneSentencePair(dataset_slug, sentence_pair_id)
+      .then((res) => {
+        updateSentencePair(sentence_pair);
+        setAlignStatus("auto aligned");
+      });
   };
 
   return (
